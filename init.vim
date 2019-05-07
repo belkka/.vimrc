@@ -42,7 +42,13 @@ call vundle#end()            " required
 filetype plugin on
 syntax on
 
-colorscheme my_pablo
+try
+	colorscheme my_pablo
+catch /^Vim\%((\a\+)\)\=:E185/
+	echo v:exception
+	echo "Falling back to colorscheme pablo"
+	colorscheme pablo
+endtry
 
 set shiftwidth=4
 set smartindent number showmode ruler cursorline autochdir
