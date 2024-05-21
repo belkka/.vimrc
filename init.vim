@@ -1,19 +1,17 @@
 set nocompatible              " be iMproved, required
 filetype off                  " required
 
-" set the runtime path to include Vundle and initialize
+let g:python3_host_prog = '/usr/bin/python3'
+
 set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
-" alternatively, pass a path where Vundle should install plugins
-"call vundle#begin('~/some/path/here')
-
-" let Vundle manage Vundle, required
 Plugin 'VundleVim/Vundle.vim'
 
-Plugin 'tpope/vim-abolish'
-Plugin 'kurkale6ka/vim-swap'
-Plugin 'tommcdo/vim-exchange'
-Plugin 'tpope/vim-characterize'
+Plugin 'tpope/vim-surround'
+Plugin 'tpope/vim-abolish'  " cr coercion
+"Plugin 'kurkale6ka/vim-swap'
+"Plugin 'tommcdo/vim-exchange'
+Plugin 'tpope/vim-characterize'  " ga
 Plugin 'tpope/vim-repeat'
 Plugin 'jiangmiao/auto-pairs'
 "Plugin 'takac/vim-hardtime'
@@ -21,20 +19,36 @@ Plugin 'jiangmiao/auto-pairs'
 "Plugin 'tomtom/tlib_vim'
 "Plugin 'garbas/vim-snipmate'
 "Plugin 'honza/vim-snippets'
-"Plugin 'scrooloose/nerdtree'
+Plugin 'preservim/nerdcommenter'
+Plugin 'scrooloose/nerdtree'
 "Plugin 'nathanaelkane/vim-indent-guides'
-Plugin 'Yggdroot/indentLine'
-Plugin 'ap/vim-css-color'
-Plugin 'udalov/kotlin-vim'
-Plugin 'artur-shaik/vim-javacomplete2'
+"Plugin 'Yggdroot/indentLine'
+Plugin 'https://github.com/airblade/vim-gitgutter'
+Plugin 'https://github.com/romainl/vim-dichromatic'  " colorcheme dichromatic
+Plugin 'https://github.com/romainl/vim-cool'  " :nohl
+Plugin 'https://github.com/ervandew/supertab'
+
+" Languages
+Plugin 'bfrg/vim-cpp-modern'
+Plugin 'cespare/vim-toml'
+Plugin 'chaimleib/vim-renpy'
+Plugin 'hjson/vim-hjson'
+Plugin 'kovetskiy/sxhkd-vim'
+Plugin 'https://github.com/tpope/vim-jdaddy'  "ij aj gqaj gwaj
+"Plugin 'ap/vim-css-color'
+"Plugin 'artur-shaik/vim-javacomplete2'
+"Plugin 'mrk21/yaml-vim'
+"Plugin 'udalov/kotlin-vim'
 
 " completer
-Plugin 'Valloric/YouCompleteMe'
+"Plugin 'Valloric/YouCompleteMe'
 "Plugin 'lifepillar/vim-mucomplete'
 "Plugin 'ajh17/VimCompletesMe'
 "Plugin 'Shougo/deoplete.nvim'  " TODO: try
 
 "Plugin 'ludovicchabant/vim-gutentags'
+"Plugin 'mgedmin/python-imports.vim'
+Plugin 'davidhalter/jedi-vim'
 
 call vundle#end()            " required
 
@@ -42,19 +56,23 @@ call vundle#end()            " required
 filetype plugin on
 syntax on
 
-try
-	colorscheme my_pablo
-catch /^Vim\%((\a\+)\)\=:E185/
-	echo v:exception
-	echo "Falling back to colorscheme pablo"
-	colorscheme pablo
-endtry
+for s:cs in ["murphy", "dichromatic", "my_pablo", "pablo"]
+    try
+        execute "colorscheme " .. s:cs
+        echo "Using colorscheme " .. s:cs
+        break
+    catch /^Vim\%((\a\+)\)\=:E185/
+        echo v:exception
+    endtry
+endfor
+unlet s:cs
 
 set shiftwidth=4
-set smartindent number showmode ruler cursorline autochdir
-set nohlsearch noincsearch
+set autoindent number showmode ruler cursorline
+"set autochdir
+set noincsearch
 set foldmethod=syntax foldminlines=4 foldlevelstart=99
-set mouse=a
+set mouse=a clipboard=unnamedplus
 set scrolloff=3
 set diffopt+=,vertical
 set laststatus=2
@@ -62,44 +80,61 @@ set list listchars=tab:▸\ ,trail:·
 set linebreak breakindent showbreak=\ \  " nice wrapping
 set colorcolumn=0
 set tabstop=4
+set signcolumn=yes
+set updatetime=400
+
+" Fix weird built-in python indent |ft-python-indent|
+let g:pyindent_open_paren = '&sw'
+let g:pyindent_nested_paren = '0'
+let g:pyindent_continue = '0'
+
+noremap <Del> :quit<CR>
+noremap <Backspace> 
+noremap <C-j> <C-d>
+noremap <C-k> <C-u>
+noremap <Down> 3
+noremap <Up> 3
+noremap <Right> :tabnext<CR>
+noremap <Left> :tabprev<CR>
+noremap <F4> :set list!<CR>
+inoremap <M-.> <C-t>
+inoremap <M-,> <C-d>
+tnoremap <Esc> <C-\><C-n>
+
 
 let mapleader = ' '
 
 nnoremap <leader>ve :tabedit $MYVIMRC<CR>
 nnoremap <leader>vr :so $MYVIMRC<CR>
-inoremap <C-a>c <ESC>:%y+<CR>a
-
-noremap <Backspace> 
-noremap <Down> 
-noremap <UP> 
-
-noremap <Return> :cc<CR>
-noremap <Right> :cnext<CR>
-noremap <Left> :cprev<CR>
-
-noremap <F3> :set hlsearch!<CR>
-noremap <F4> :IndentLinesToggle<CR>
-noremap <F5> :set list!<CR>
-":IndentGuidesToggle<CR>
-
-noremap <F8> :TlistToggle<CR>
-noremap <F9> :make<CR>
+nnoremap <leader>e :NERDTreeFind<CR>
 
 "nnoremap <leader>baro :echo "Enter key:"<CR>"zyy"zpVr
 "nnoremap <leader>barO :echo "Enter key:"<CR>"zyy"zPVr
 
+if exists(":YcmCompleter")
+    nnoremap <leader>gd :YcmCompleter GoToDefinitionElseDeclaration<CR>
+    nnoremap <leader>gD :YcmCompleter GoToDeclaration<CR>
+    nnoremap <leader><leader> :YcmCompleter GoTo<CR>
+    nnoremap <leader>fi :YcmCompleter FixIt<CR>
+endif
+
+
 augroup vimrc
     autocmd!
     "autocmd BufEnter * silent! lcd %:h  " look for 'autochdir'
-    autocmd FileType c,cpp,python,sh,haskell,cmake,tex,java,html,kotlin,lua setlocal expandtab colorcolumn=80
+    autocmd FileType c,cpp,python,haskell,cmake,tex,java,html,kotlin,lua
+        \ setlocal expandtab colorcolumn=80,120
     autocmd FileType c,cpp,python,sh,tex,haskell,java,html,kotlin,lua
-    \ autocmd BufWritePre,FileWritePre <buffer> call RStrip()
+        \ autocmd BufWritePre,FileWritePre <buffer> call RStrip()
 augroup END
 
-" Deoplete
-"let g:python_host_prog = "/usr/bin/python2"
-"let g:python3_host_prog = "/usr/bin/python3"
-"let g:deoplete#enable_at_startup = 1
+" Remove trailing whitespaces
+function! RStrip()
+    let cursor_pos = getpos('.')
+    silent %s/\s\+$//e
+    call setpos('.', cursor_pos)
+endfunction
+
 
 " Surround
 let g:surround_indent = 1
@@ -109,12 +144,8 @@ let g:ycm_autoclose_preview_window_after_insertion = 1
 let g:ycm_autoclose_preview_window_after_completion = 0
 let g:ycm_add_preview_to_completeopt = 0
 let g:ycm_open_loclist_on_ycm_diags = 0
-let g:ycm_filetype_whitelist = { 'cpp':1, 'c':1, 'python':1, 'lua':1, 'java':1, 'kotlin':1, 'sh':1 }
+let g:ycm_filetype_whitelist = { 'cpp':1, 'c':1, 'python':0, 'lua':1, 'java':1, 'kotlin':1, 'sh':0 }
 let g:ycm_filetype_blacklist = { 'tex':1, 'text':1, 'markdown':1 }
-nnoremap <leader>gd :YcmCompleter GoToDefinitionElseDeclaration<CR>
-nnoremap <leader>gD :YcmCompleter GoToDeclaration<CR>
-nnoremap <leader><leader> :YcmCompleter GoTo<CR>
-nnoremap <leader>fi :YcmCompleter FixIt<CR>
 
 " Mucomplete
 "let g:mucomplete#enable_auto_at_startup = 0
@@ -138,23 +169,30 @@ let g:indentLine_color_term = 'darkcyan'
 let g:indentLine_char = '┊'  "│┆┊
 let g:indentLine_enabled = 0
 
+" AutoPairs
+let g:AutoPairsMultilineClose = 0
 
-" Hardtime
-"let g:hardtime_default_on = 1
-"let g:hardtime_allow_different_key = 0
-"let g:hardtime_maxcount = 1
-"let g:hardtime_timeout = 5000  " default 1000
-"let g:hardtime_showmsg = 0  " default 0
-"let g:list_of_normal_keys = [ "h", "j", "k", "l" ]
-"let g:list_of_visual_keys = [ "h", "j", "k", "l" ]
-"let g:list_of_insert_keys = [  ]
-"let g:list_of_disabled_keys = [ "<UP>", "<DOWN>", "<LEFT>", "<RIGHT>" ]
+" NERDTree
+let NERDTreeIgnore = ['__pycache__']
+let NERDTreeMouseMode = 3
 
+" gutentags
+let g:gutentags_project_root = ['.git']
+let g:gutentags_add_default_project_roots = 0
+let g:gutentags_cache_dir = '/tmp/gutentags'
 
-"" Remove trailing whitespaces
-function! RStrip()
-    let cursor_pos = getpos('.')
-    silent %s/\s\+$//e
-    call setpos('.', cursor_pos)
-endfunction
+" jedi
+let g:jedi#rename_command = "<f2>"
+let g:jedi#smart_auto_mappings = 1
+let g:jedi#use_tag_stack = 1
+let g:jedi#use_splits_not_buffers = "right"
+"let g:jedi#show_call_signatures = 0
 
+" vim-gitgutter
+if exists(':GitGutterGetHunkSummary')
+    function! GitStatus()
+        let [a,m,r] = GitGutterGetHunkSummary()
+        return printf('git changes: +%d ~%d -%d', a, m, r)
+    endfunction
+    set statusline& statusline+=%{GitStatus()}
+endif
