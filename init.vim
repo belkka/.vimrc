@@ -3,6 +3,8 @@ filetype off                  " required
 
 let g:python3_host_prog = '/usr/bin/python3'
 
+set runtimepath+=/usr/share/vifm/vim/
+
 set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
 Plugin 'VundleVim/Vundle.vim'
@@ -35,6 +37,7 @@ Plugin 'chaimleib/vim-renpy'
 Plugin 'hjson/vim-hjson'
 Plugin 'kovetskiy/sxhkd-vim'
 Plugin 'https://github.com/tpope/vim-jdaddy'  "ij aj gqaj gwaj
+Plugin 'https://github.com/mtdl9/vim-log-highlighting'
 "Plugin 'ap/vim-css-color'
 "Plugin 'artur-shaik/vim-javacomplete2'
 "Plugin 'mrk21/yaml-vim'
@@ -101,6 +104,7 @@ inoremap <M-.> <C-t>
 inoremap <M-,> <C-d>
 tnoremap <Esc> <C-\><C-n>
 
+command Automake autocmd BufWritePost <buffer> make
 
 let mapleader = ' '
 
@@ -126,6 +130,7 @@ augroup vimrc
         \ setlocal expandtab colorcolumn=80,120
     autocmd FileType c,cpp,python,sh,tex,haskell,java,html,kotlin,lua
         \ autocmd BufWritePre,FileWritePre <buffer> call RStrip()
+    autocmd FileType c,cpp,python setlocal nowrap
 augroup END
 
 " Remove trailing whitespaces
