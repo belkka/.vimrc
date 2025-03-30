@@ -187,7 +187,9 @@ let g:gutentags_add_default_project_roots = 0
 let g:gutentags_cache_dir = '/tmp/gutentags'
 
 " jedi
-let g:jedi#rename_command = "<f2>"
+let g:jedi#goto_command = "gd"
+let g:jedi#rename_command = ""
+let g:jedi#rename_command_keep_name = "<f2>"
 let g:jedi#smart_auto_mappings = 1
 let g:jedi#use_tag_stack = 1
 let g:jedi#use_splits_not_buffers = "right"
